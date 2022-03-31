@@ -23,13 +23,13 @@ seriesRoutes.get('/', async (req, res) => {
   }
 });
 
-seriesRoutes.get('/:serieId', async (req, res) => {
+seriesRoutes.get('/:serieId', async (req, res, next) => {
   try {
     const {serieId } = req.params;
-    const data = await service.showSerie(serieId)
-    res.status(200).json(data)
+    const data = await service.showSerie(serieId);
+    res.status(200).json(data);
   } catch (error) {
-    res.status(404).json({ message:error })
+    next(error);
   }
 });
 
@@ -55,7 +55,7 @@ seriesRoutes.get('/premier/:premier_date', async (req, res) => {
   }
 });
 
-seriesRoutes.put('/:serieId', async (req, res) => {
+seriesRoutes.put('/:serieId', async (req, res, next) => {
   try {
     const { serieId } = req.params;
     const { serie, number_seasons, original_lenguage, features_seasons } = req.body;
@@ -65,17 +65,17 @@ seriesRoutes.put('/:serieId', async (req, res) => {
     );
     res.status(200).json({ data });
   } catch (error) {
-    res.status(204).json({ message: error });
+    next(error)
   }
 });
 
-seriesRoutes.delete('/:serieId', async (req, res) => {
+seriesRoutes.delete('/:serieId', async (req, res, next) => {
   try{
     const { serieId } = req.params;
     const deleted = await service.removeSerie(serieId)
     res.status(200).json(deleted)
   }catch(error){
-    res.status(500).json({ message:error })
+    next(error)
   }
 });
 

@@ -1,4 +1,6 @@
 const serieSchema = require("../models/series.model");
+const Boom = require('@hapi/boom');
+
 class SeriesService {
   async createSerie(serie) {
     serie.save();
@@ -14,7 +16,12 @@ class SeriesService {
   }
 
   async showSerie(serieId) {
-    return serieSchema.findById({ _id: serieId });
+    return serieSchema.findById({ _id: serieId }).then(
+      (serieFound) =>  {
+        if (!serieFound) throw Boom.notFound('No se encontró la serie');
+        return serieFound;
+      }
+    );
   }
 
   // punto 2-a
@@ -26,12 +33,16 @@ class SeriesService {
         seriesFound.push(serie)
       }
     })
+
+    if (seriesFound.length === 0 ) throw Boom.notFound('No se encontró la serie')
     return seriesFound;
   }
 
   // punto 2-b
   async showSerieByDate(premier_date) {
-    return serieSchema.find({ 'features_seasons.premier_date' : premier_date });
+    const data = serieSchema.find({ 'features_seasons.premier_date' : premier_date })
+    if (data.length === 0 ) throw Boom.notFound('No se encontró la serie')
+    return data;
   }
 
   async editSerie(
@@ -41,8 +52,8 @@ class SeriesService {
     original_lenguage,
     features_seasons
   ) {
-    return serieSchema.findById({ _id: serieId }).then(() => {
-      if (!serieId) throw Error('Serie no encontrada');
+    return serieSchema.findById({ _id: serieId }).then((serieFound) => {
+      if (!serieFound) throw Boom.notFound('No se encontró la serie')
       return serieSchema.updateOne(
         { _id:serieId },
         { serie, number_seasons, original_lenguage, features_seasons }
@@ -51,8 +62,12 @@ class SeriesService {
   }
 
   async removeSerie(serieId) {
-    const serieRemove = serieSchema.findById({ _id: serieId });
-    return serieSchema.deleteOne(serieRemove);
+    return serieSchema.findById({ _id: serieId }).then(
+      (serieFound) => {
+        if (!serieFound) throw Boom.notFound('No se encontró la serie');
+        return serieSchema.deleteOne(serieFound);
+      }
+    );
   }
 }
 
