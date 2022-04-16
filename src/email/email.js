@@ -9,7 +9,7 @@ const client = mailgun.client({
 });
 const domain = process.env.DOMAIN_MAIL_GUN;
 
-function sendEmailConfirmation() {
+function sendEmailConfirmation(customerName, orderNroSerie) {
   return `<!DOCTYPE html>
   <html lang="en">
 
@@ -27,7 +27,9 @@ function sendEmailConfirmation() {
       </div>
     </div>
     <div class="row">
-      <p><small></small></p>
+      <p><small>Cordial saludo, ${customerName}, te confirmamos la recepción de tu pedido
+      y se ha generado una factura con orden de compra ${orderNroSerie}.
+      Agradecemos tu compra.</small></p>
     </div>
   </body>
 
@@ -39,9 +41,6 @@ function getMessage(emailParams) {
     from: "Excited user <erika.1702010705@ucaldas.edu.co>",
     to: emailParams.toEmail,
     subject: `Confirmación pedido serie ${emailParams.orderNroSerie}`,
-    text: `Cordial saludo, ${emailParams.customerName}, te confirmamos la recepción de tu pedido
-    y se ha generado una factura con orden de compra ${emailParams.orderNroSerie}.
-    Agradecemos tu compra.`,
     html: sendEmailConfirmation(
       emailParams.customerName,
       emailParams.orderNroSerie
